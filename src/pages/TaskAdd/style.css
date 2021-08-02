@@ -1,0 +1,6 @@
+.group__wrapper .ant-space-horizontal {
+  display: block;
+}
+.group__wrapper .ant-pro-form-list > div {
+  width: 100% !important;
+}
