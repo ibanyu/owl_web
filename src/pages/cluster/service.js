@@ -4,7 +4,7 @@
 import { request } from 'umi';
 
 export async function cluster(data, options){
-  return request('/dbinjection-open/db-injection/cluster/list', {
+  return request('/db-injection/cluster/list', {
     method: 'POST',
     data,
     ...(options || {}),
@@ -14,7 +14,7 @@ export async function cluster(data, options){
 /** 新建规则 PUT /api/rule */
 
 export async function updateCluster(data, options) {
-  return request('/dbinjection-open/db-injection/cluster/update', {
+  return request('/db-injection/cluster/update', {
     method: 'POST',
     data,
     ...(options || {}),
@@ -22,7 +22,7 @@ export async function updateCluster(data, options) {
 }
 
 export async function addCluster(data, options) {
-  return request('/dbinjection-open/db-injection/cluster/add', {
+  return request('/db-injection/cluster/add', {
     method: 'POST',
     data,
     ...(options || {}),
@@ -30,7 +30,7 @@ export async function addCluster(data, options) {
 }
 
 export async function removeCluster(data, options) {
-  return request(`/dbinjection-open/db-injection/cluster/del?id=${data.id}`, {
+  return request(`/db-injection/cluster/del?id=${data.id}`, {
     method: 'POST',
     params: {},
     ...(options || {}),

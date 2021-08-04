@@ -87,46 +87,45 @@ const TableList = () => {
     {
       title: 'id',
       dataIndex: 'id',
+      align: 'center',
     },
     {
       title: '集群名',
       dataIndex: 'name',
-    },
-    {
-        title: '描述',
-        dataIndex: 'description',
-    },
-    {
-        title: '地址',
-        dataIndex: 'addr',
+      align: 'center',
     },
     {
       title: '描述',
-      dataIndex: 'desc',
-      valueType: 'textarea',
+      dataIndex: 'description',
+      align: 'center',
+    },
+    {
+      title: '地址',
+      dataIndex: 'addr',
+      align: 'center',
     },
     {
       title: '用户名',
       dataIndex: 'user',
+      align: 'center',
     },
     {
       title: '创建时间',
       dataIndex: 'ct',
       render: (v) => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-',
+      align: 'center',
     },
     {
       title: '更新时间',
       dataIndex: 'ut',
       render: (v) => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-',
-    },
-    {
-      title: '操作人',
-      dataIndex: 'operator',
+      align: 'center',
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
+      align: 'center',
       render: (_, record) => [
         <Tooltip
           key="edit"
@@ -214,11 +213,11 @@ const TableList = () => {
           rules={[
             {
               required: true,
-              message: '数据库名称为必填项',
+              message: '集群名称为必填项',
             },
           ]}
           width="md"
-          label="数据库名称"
+          label="集群名称"
           name="name"
         />
         <ProFormText
@@ -242,6 +241,7 @@ const TableList = () => {
           width="md"
           label="地址"
           name="addr"
+          placeholder="请输入ip:port"
         />
         <ProFormText
           rules={[
@@ -261,6 +261,7 @@ const TableList = () => {
               message: '密码为必填项',
             },
           ]}
+          fieldProps={{visibilityToggle: false}}
           width="md"
           label="密码"
           name="pwd"

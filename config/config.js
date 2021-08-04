@@ -1,9 +1,10 @@
 // https://umijs.org/config/
 import { defineConfig } from 'umi';
-import { join } from 'path';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
-const { REACT_APP_ENV } = process.env;
+const { REACT_APP_ENV, NODE_ENV } = process.env;
+const isDev = NODE_ENV === 'development';
+
 export default defineConfig({
   hash: true,
   antd: {},
@@ -31,6 +32,8 @@ export default defineConfig({
   targets: {
     ie: 11,
   },
+  base: '/ui/',
+  publicPath: isDev ? undefined : '/ui/',
   // umi routes: https://umijs.org/docs/routing
   routes: [
     {
@@ -40,6 +43,7 @@ export default defineConfig({
         {
           path: '/user/login',
           layout: false,
+
           name: 'login',
           component: './User/Login',
         },
@@ -55,8 +59,9 @@ export default defineConfig({
     {
       path: '/cluster',
       name: '集群列表',
+      access: 'admin',
       icon: 'table',
-      component: './cluster/list',
+      component: './cluster',
     },
     {
       path: '/task/add',
@@ -65,16 +70,16 @@ export default defineConfig({
       component: './TaskAdd',
     },
     {
-      path: '/task/list',
-      name: '执行列表',
-      icon: 'bars',
-      component: './TaskExec/list',
-    },
-    {
       path: '/task/review',
       name: '任务审核',
       icon: 'diff',
       component: './TaskReview/list',
+    },
+    {
+      path: '/task/list',
+      name: '执行列表',
+      icon: 'bars',
+      component: './TaskExec/list',
     },
     {
       name: '执行页',
@@ -92,7 +97,7 @@ export default defineConfig({
       path: '/task/history',
       name: '任务历史',
       icon: 'menu',
-      component: './TaskHistory/list',
+      component: './TaskHistory',
     },
     {
       path: '/rules/list',
@@ -125,6 +130,13 @@ export default defineConfig({
           component: './exception/500',
         },
       ],
+    },
+    {
+      path: '/authority',
+      name: '权限管理',
+      access: 'admin',
+      icon: 'user',
+      component: './authority',
     },
     {
       path: '/',

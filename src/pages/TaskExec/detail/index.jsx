@@ -1,11 +1,12 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormTextArea } from '@ant-design/pro-form';
+import { ModalForm, ProFormTextArea, ProFormDateTimePicker } from '@ant-design/pro-form';
 import { Card, Descriptions, Divider, Button, Popconfirm } from 'antd';
 import React, { useState } from 'react';
 import { useParams } from "react-router-dom";
 import { useRequest } from 'umi';
 import moment from 'moment';
+import { renderBadge } from '@/constants';
 
 import { handleUpdate } from '../list/';
 import { queryTaskProfile } from './service';
@@ -16,6 +17,7 @@ const TaskDetail = () => {
   let { id } = useParams();
   id = +id;
   const [modalVisible, handleModalVisible] = useState(false);
+  const [scheduleModalVisible, handleScheduleModalVisible] = useState(false);
   const { data = {}, loading, refresh } = useRequest(() => {
     return queryTaskProfile(id);
   });
@@ -64,14 +66,14 @@ const TaskDetail = () => {
     return operation;
   };
   const taskColumns = [
-    { title: '序号', dataIndex: 'id' },
-    { title: '数据库', dataIndex: 'db_name' },
-    { title: '任务类型', dataIndex: 'task_type' },
-    { title: '影响行数', dataIndex: 'affect_rows' },
-    { title: '状态', dataIndex: 'status' },
-    { title: '执行信息', dataIndex: 'exec_info' },
-    { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code' },
-    { title: '备注', dataIndex: 'remark' },
+    { title: '序号', dataIndex: 'id', align: 'center', },
+    { title: '数据库', dataIndex: 'db_name', align: 'center', },
+    { title: '任务类型', dataIndex: 'task_type', align: 'center', },
+    { title: '影响行数', dataIndex: 'affect_rows', align: 'center', },
+    { title: '状态', dataIndex: 'status', align: 'center', render: (status) => renderBadge(status), },
+    { title: '执行信息', dataIndex: 'exec_info', align: 'center', },
+    { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code', },
+    { title: '备注', dataIndex: 'remark', align: 'center', },
     {
       title: '操作',
       dataIndex: 'option',
@@ -87,13 +89,14 @@ const TaskDetail = () => {
       <Card bordered={false}>
         <Descriptions
           title="基本信息"
+          column={4}
           style={{
             marginBottom: 32,
           }}
         >
           <Descriptions.Item label="任务名">{data.name}</Descriptions.Item>
           <Descriptions.Item label="任务id">{data.id}</Descriptions.Item>
-          <Descriptions.Item label="状态">{data.status_name}</Descriptions.Item>
+          <Descriptions.Item label="状态">{renderBadge(data.status, data.status_name)}</Descriptions.Item>
           <Descriptions.Item label="创建者">{data.creator}</Descriptions.Item>
           <Descriptions.Item label="创建时间">{data.ct ? moment.unix(data.ct).format('YYYY-MM-DD HH:mm:ss') : '-'}</Descriptions.Item>
           <Descriptions.Item label="执行时间">{data.et ? moment.unix(data.et).format('YYYY-MM-DD HH:mm:ss') : '-'}</Descriptions.Item>
@@ -142,6 +145,13 @@ const TaskDetail = () => {
                 执行
               </Button>
           </Popconfirm>,
+          <Button
+            key="schedule-exec"
+            type="default"
+            onClick={() => handleScheduleModalVisible(true)}
+          >
+            调度执行
+          </Button>
           ]}
           dataSource={tableDataSource}
           columns={taskColumns}
@@ -174,6 +184,45 @@ const TaskDetail = () => {
             {
               required: true,
               message: '请输入驳回理由',
+            },
+          ]}
+        />
+      </ModalForm>
+      <ModalForm
+        title="调度执行"
+        width="400px"
+        modalProps={{
+          destroyOnClose: true,
+          maskClosable: false
+        }}
+        visible={scheduleModalVisible}
+        onVisibleChange={handleScheduleModalVisible}
+        onFinish={async (fields) => {
+          const success = await handleUpdate({
+            id,
+            action: 'progress',
+            ...fields,
+            et: moment(fields.et).unix(),
+          });
+          if (success) {
+            handleScheduleModalVisible(false);
+            refresh();
+          }
+        }}
+      >
+        <ProFormDateTimePicker
+          width="md"
+          name="et"
+          fieldProps={{
+            disabledDate: (current) => {
+              return current && current < moment();
+            }
+          }}
+          label="开始时间"
+          rules={[
+            {
+              required: true,
+              message: '请选择开始时间',
             },
           ]}
         />

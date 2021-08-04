@@ -8,12 +8,9 @@
  */
 export default {
   dev: {
-    '/dbinjection-open/': {
+    '/db-injection/': {
       target: 'http://10.111.131.215:8087/',
       changeOrigin: true,
-      pathRewrite: {
-        '^/dbinjection-open': '',
-      },
     },
     '/api/': {
       target: 'https://dev.pro.ant.design/',

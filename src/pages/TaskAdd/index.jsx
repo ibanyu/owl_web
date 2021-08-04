@@ -8,7 +8,7 @@ import ProForm, {
   ProFormTextArea,
   ProFormList,
 } from '@ant-design/pro-form';
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useRequest } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProCard from '@ant-design/pro-card';
@@ -29,6 +29,25 @@ const BasicForm = () => {
   const formRef = useRef(null);
 
   const { data = {} } = useRequest(dataBase, {});
+
+  const formatDBClusters = (dbClusters) => {
+    const clusterMapDB = {};
+    Object.entries(dbClusters).forEach(([dbName, clusters]) => {
+      clusters.reduce((acc, cluster) => {
+        acc[cluster] = acc[cluster] || [];
+        acc[cluster].push(dbName);
+        return acc;
+      }, clusterMapDB)
+    });
+    return clusterMapDB;
+  }
+  const clusterDBs = useMemo(() => formatDBClusters(data), [data]);
+
+  const clusters = Object.keys(clusterDBs).reduce((acc, current) => {
+    acc[current] = current;
+    return acc;
+  }, {});
+
   const dbs = Object.keys(data).reduce((acc, current) => {
     acc[current] = current;
     return acc;
@@ -39,7 +58,7 @@ const BasicForm = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer className="task__add--container">
       <Card bordered={false}>
         <ProForm
           scrollToFirstError
@@ -48,7 +67,7 @@ const BasicForm = () => {
             marginTop: 8,
           }}
           formRef={formRef}
-          labelCol={{span: 8}}
+          labelCol={{span: 5}}
           wrapperCol={{span: 16}}
           name="basic"
           layout="horizontal"
@@ -56,7 +75,7 @@ const BasicForm = () => {
             render: (props, doms) => {
               return [
                 <Row key="submit">
-                  <Col span={16} offset={8}>
+                  <Col span={10} offset={5}>
                     <Button type="primary"  onClick={() => props.form?.submit?.()}>
                       提交检测
                   </Button>
@@ -68,9 +87,9 @@ const BasicForm = () => {
           onFinish={onFinish}
         >
           <ProFormText
-            width="md"
+            width="lg"
             label="任务名称"
-            name="title"
+            name="name"
             rules={[
               {
                 required: true,
@@ -131,7 +150,7 @@ const BasicForm = () => {
                     value: 'UPDATE',
                   },
                   {
-                    label: '增删数据',
+                    label: '增删改数据',
                     value: 'DML',
                   },
                 ]}
@@ -140,32 +159,33 @@ const BasicForm = () => {
               />
               <ProFormSelect
                 showSearch
-                valueEnum={dbs}
-                name="db_name"
-                label="数据库"
-                placeholder="请选择数据库"
+                valueEnum={clusters}
+                width="lg"
+                name="cluster_name"
+                label="集群名"
+                placeholder="请选择集群名"
                 rules={[
                   {
                     required: true,
-                    message: '请选择数据库',
+                    message: '请选择集群名',
                   },
                 ]}
               />
-              <ProFormDependency name={['db_name']}>
-                {({ db_name: dbName }) => {
+              <ProFormDependency name={['cluster_name']}>
+                {({ cluster_name: clusterName }) => {
                   return (
                     <ProFormSelect
                       showSearch
-                      options={data[dbName] ? data[dbName].map(cluster => ({label: cluster, value: cluster})) : null}
-                      width="md"
-                      name="cluster_name"
+                      width="lg"
+                      options={clusterDBs[clusterName] ? clusterDBs[clusterName].map(db => ({label: db, value: db})) : null}
+                      name="db_name"
                       rules={[
                         {
                           required: true,
-                          message: '请选择集群',
+                          message: '请选择数据库',
                         },
                       ]}
-                      label={`集群名`}
+                      label={`数据库`}
                     />
                   );
                 }}
@@ -177,7 +197,7 @@ const BasicForm = () => {
                 creatorButtonProps={{
                   creatorButtonText: '添加SQL'
                 }}
-                itemRender={({ listDom, action, }, { record, field }, ...args) => {
+                itemRender={({ listDom, action, }, { field }) => {
                   return (
                     <ProCard
                       bordered
@@ -194,7 +214,7 @@ const BasicForm = () => {
               >
                 <ProForm.Group>
                   <ProFormTextArea
-                    width="md"
+                    width="lg"
                     name="sql_content"
                     fieldProps={{autoSize: { minRows: 5,}, minRows: 5}}
                     label="SQL"
@@ -207,10 +227,10 @@ const BasicForm = () => {
                     ]}
                   />
                   <ProFormTextArea
-                    width="md"
+                    width="lg"
                     name="remark"
                     fieldProps={{
-                      autoSize: true,
+                      autoSize: { minRows: 5,},
                       minRows: 5,
                       labelCol:{span: 4}
                     }}
@@ -222,36 +242,6 @@ const BasicForm = () => {
               </ProFormList>
             </ProFormGroup>
           </ProFormList>
-           {/* <ProFormDependency name={['publicType']}>
-            {({ publicType }) => {
-              return (
-                <ProFormSelect
-                  width="md"
-                  name="publicUsers"
-                  fieldProps={{
-                    style: {
-                      margin: '8px 0',
-                      display: publicType && publicType === '2' ? 'block' : 'none',
-                    },
-                  }}
-                  options={[
-                    {
-                      value: '1',
-                      label: '同事甲',
-                    },
-                    {
-                      value: '2',
-                      label: '同事乙',
-                    },
-                    {
-                      value: '3',
-                      label: '同事丙',
-                    },
-                  ]}
-                />
-              );
-            }}
-          </ProFormDependency> */}
         </ProForm>
       </Card>
     </PageContainer>

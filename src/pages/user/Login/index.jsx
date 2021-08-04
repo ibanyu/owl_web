@@ -102,7 +102,7 @@ const Login = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
+                  defaultMessage: '用户名: LDAP用户',
                 })}
                 rules={[
                   {
@@ -124,7 +124,7 @@ const Login = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码: ant.design',
+                  defaultMessage: '密码: LDAP密码',
                 })}
                 rules={[
                   {

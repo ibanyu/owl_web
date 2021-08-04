@@ -1,10 +1,12 @@
-import { message, Popconfirm } from 'antd';
+import { message, Popconfirm, Tooltip } from 'antd';
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { ModalForm, ProFormTextArea } from '@ant-design/pro-form';
 import moment from 'moment';
+
+import { renderBadge } from '@/constants';
 import { updateTask, task } from './service';
 
 /**
@@ -32,14 +34,14 @@ const expandedRowRender = (row) => {
   return <ProTable
     columnEmptyText="-"
     columns={[
-      { title: '序号', dataIndex: 'id' },
-      { title: '数据库', dataIndex: 'db_name' },
-      { title: '任务类型', dataIndex: 'task_type' },
-      { title: '影响行数', dataIndex: 'affect_rows' },
-      { title: '状态', dataIndex: 'status_name' },
-      { title: '执行信息', dataIndex: 'exec_info' },
-      { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code' },
-      { title: '备注', dataIndex: 'remark' },
+      { title: '序号', dataIndex: 'id', align: "center", },
+      { title: '数据库', dataIndex: 'db_name', align: "center", },
+      { title: '任务类型', dataIndex: 'task_type', align: "center", },
+      { title: '影响行数', dataIndex: 'affect_rows', align: "center", },
+      { title: '状态', dataIndex: 'status', align: "center", render: (status) => renderBadge(status)},
+      { title: '执行信息', dataIndex: 'exec_info', align: "center", },
+      { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code',},
+      { title: '备注', dataIndex: 'remark', align: "center", },
     ]}
     rowKey="id"
     headerTitle={false}
@@ -68,6 +70,7 @@ const TableList = () => {
         return <a onClick={() => history.push(`/task/review/detail/${v}`)}>{v}</a>;
       },
       hideInSearch: true,
+      align: "center",
     },
     {
       title: '任务名',
@@ -76,42 +79,49 @@ const TableList = () => {
         label: '模糊搜索',
         name: 'key',
       },
+      align: "center",
+
     },
     {
       title: '状态',
       dataIndex: 'status_name',
       hideInSearch: true,
+      align: "center",
+      render: (statusName, record) => {
+        if(record.reject_content){
+          return (
+            <Tooltip title={record.reject_content}>
+              {renderBadge(record.status, statusName)}
+            </Tooltip>
+          )
+        }
+        return renderBadge(record.status, statusName)
+      },
     },
     {
       title: '创建者',
       dataIndex: 'creator',
       hideInSearch: true,
+      align: "center",
     },
     {
       title: '审核人',
       dataIndex: 'reviewer',
       hideInSearch: true,
-    },
-    {
-      title: '拒绝内容',
-      dataIndex: 'reject_content',
-      hideInSearch: true,
+      align: "center",
     },
     {
       title: '创建时间',
       dataIndex: 'ct',
       render: (v) => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-',
       hideInSearch: true,
-    },
-    {
-      title: '操作者',
-      dataIndex: 'operator',
-      hideInSearch: true,
+      align: "center",
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
+      align: "center",
       render: (_, record) => {
         return [
           !!(record.edit_auth.turn_down_enable) && <Popconfirm
@@ -126,23 +136,9 @@ const TableList = () => {
               驳回
             </a>
           </Popconfirm>,
-          !!record.edit_auth.review_pass_enable && <Popconfirm
-            key="approve"
-            onConfirm={async () => {
-              const success = await handleUpdate({
-                id: record.id,
-                action: 'progress',
-              });
-              if(success){
-                actionRef.current.reload();
-              }
-            }}
-            title={`确定审核通过 ${record.name} 么？`}
-          >
-            <a>
-              审核通过
-            </a>
-          </Popconfirm>,
+          !!record.edit_auth.review_pass_enable && <a onClick={() => history.push(`/task/review/detail/${record.id}`)}>
+            审核
+          </a>,
           !!record.edit_auth.withdraw_enable && <Popconfirm
             key="cancel"
             onConfirm={async () => {
@@ -157,7 +153,7 @@ const TableList = () => {
             title={`确定要撤销 ${record.name} 么？`}
           >
             <a>
-              审核通过
+              撤销
             </a>
           </Popconfirm>,
         ].filter(Boolean);

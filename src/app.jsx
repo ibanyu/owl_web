@@ -19,9 +19,18 @@ const checkLogin = () => {
   return !!getToken();
 }
 
-
-
 const loginPath = '/user/login';
+
+const handleTokenError = (data, option) => {
+  const { location } = history;
+  const targetPath = location.pathname;
+  if(typeof data === 'string' && data.includes('please login')){
+    if(targetPath !== loginPath){
+      history.replace(`${loginPath}?redirect=${targetPath}`)
+    }
+  }
+}
+
 /** 获取用户信息比较慢的时候会展示一个 loading */
 
 export const initialStateConfig = {
@@ -99,15 +108,15 @@ export async function getInitialState() {
 export const request = {
   errorHandler: (error) => {
     const { response, message } = error;
-
+    const helpTip = message.includes('please login') ? '登录失效，请重新登录' : message;
     if (!response) {
       notification.error({
-        description: message || '您的网络发生异常，无法连接服务器',
+        description: helpTip || '您的网络发生异常，无法连接服务器',
         message: '请求异常',
       });
     }
 
-    throw error;
+    // throw error;
   },
   requestInterceptors: [
     // 鉴权注入
@@ -121,12 +130,13 @@ export const request = {
   ],
   responseInterceptors: [
     // 业务数据通用解析
-    async (response) => {
+    async (response, options) => {
       const data = await response.json();
       // 请求成功
       if(data.code === 0){
         return Promise.resolve(data.data || {});
       }
+      handleTokenError(data, options);
       return Promise.reject(data);
     }
   ],
@@ -136,9 +146,10 @@ export const layout = ({ initialState }) => {
   return {
     rightContentRender: () => null,
     disableContentMargin: false,
-    waterMarkProps: {
-      content: initialState?.currentUser?.name,
-    },
+    // waterMarkProps: {
+    //   content: initialState?.currentUser?.name,
+    // },
+    waterMarkProps: null,
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history; // 如果没有登录，重定向到 login

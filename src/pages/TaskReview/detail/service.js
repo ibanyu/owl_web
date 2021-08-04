@@ -5,7 +5,7 @@ export async function queryBasicProfile() {
 }
 
 export async function queryTaskProfile(id, options){
-  return request('/dbinjection-open/db-injection/task/get', {
+  return request('/db-injection/task/get', {
     method: 'POST',
     params: { id },
     ...(options || {}),

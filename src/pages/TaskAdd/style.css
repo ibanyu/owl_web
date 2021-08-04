@@ -1,6 +1,11 @@
-.group__wrapper .ant-space-horizontal {
+.task__add--container .group__wrapper .ant-space-horizontal {
   display: block;
 }
-.group__wrapper .ant-pro-form-list > div {
+
+.task__add--container .ant-pro-form-list > div{
   width: 100% !important;
+}
+
+.task__add--container .ant-form > div:not(.ant-pro-form-light-filter) .pro-field-lg {
+  width: 100%;
 }

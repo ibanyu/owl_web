@@ -5,6 +5,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { ModalForm, ProFormTextArea } from '@ant-design/pro-form';
 import moment from 'moment';
+import { renderBadge } from '@/constants';
+
 import { updateTask, task } from './service';
 
 /**
@@ -31,14 +33,14 @@ const expandedRowRender = (row) => {
   const data = row.exec_items || [];
   return <ProTable
     columns={[
-      { title: '序号', dataIndex: 'id' },
-      { title: '数据库', dataIndex: 'db_name' },
-      { title: '任务类型', dataIndex: 'task_type' },
-      { title: '影响行数', dataIndex: 'affect_rows' },
-      { title: '状态', dataIndex: 'status' },
-      { title: '执行信息', dataIndex: 'exec_info' },
-      { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code' },
-      { title: '备注', dataIndex: 'remark' },
+      { title: '序号', dataIndex: 'id', align: 'center' },
+      { title: '数据库', dataIndex: 'db_name', align: 'center' },
+      { title: '任务类型', dataIndex: 'task_type', align: 'center' },
+      { title: '影响行数', dataIndex: 'affect_rows', align: 'center' },
+      { title: '状态1', dataIndex: 'status', render: (status) => renderBadge(status), align: 'center' },
+      { title: '执行信息', dataIndex: 'exec_info', align: 'center' },
+      { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code', },
+      { title: '备注', dataIndex: 'remark', align: 'center' },
     ]}
     rowKey="id"
     headerTitle={false}
@@ -64,10 +66,12 @@ const TableList = () => {
       title: 'id',
       dataIndex: 'id',
       hideInSearch: true,
+      align: 'center',
     },
     {
       title: '名称',
       dataIndex: 'name',
+      align: 'center',
       formItemProps: {
         label: '模糊搜索',
         name: 'key',
@@ -77,22 +81,27 @@ const TableList = () => {
       title: '状态',
       dataIndex: 'status_name',
       hideInSearch: true,
+      render: (statusName, record) => renderBadge(record.status, statusName),
+      align: 'center',
     },
     {
       title: '创建者',
       dataIndex: 'creator',
       hideInSearch: true,
+      align: 'center',
     },
     {
       title: '待执行时间',
       dataIndex: 'ct',
       render: (v) => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-',
       hideInSearch: true,
+      align: 'center',
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
+      align: 'center',
       render: (_, record) => [
         <Popconfirm
           key="reject"
