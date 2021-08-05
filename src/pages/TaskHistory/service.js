@@ -19,10 +19,10 @@ export async function rollBack(data, options) {
   })
 }
 
-export async function backUpInfo(data, options) {
+export async function queryBackUp(data, options) {
   return request('/db-injection/backup/data', {
     method: 'POST',
     data,
     ...(options || {}),
-  })
+  }).then((data) => ({ data }))
 }

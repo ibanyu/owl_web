@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { Badge } from 'antd';
@@ -17,7 +17,9 @@ const BACKUP_STATUS_ENUM = {
 };
 
 const TableList = () => {
+  const actionRef = useRef();
   const [backUpModalVisible, handleBackUpModalVisible] = useState(false);
+  const [backUpRecord, handleBackUpRecord] = useState(null);
   const expandedRowRender = useCallback(
     (row) => {
       const data = row.exec_items || [];
@@ -42,10 +44,19 @@ const TableList = () => {
             dataIndex: 'option',
             align: 'center',
             render: (_, record) => {
-              // if(record.back_status !== 'backupSuccess'){
-              //   return '';
-              // }
-              return <a onClick={() => handleBackUpModalVisible(true)}>回滚</a>
+              if(record.backup_status !== 'backupSuccess'){
+                return '';
+              }
+              return (
+                <a
+                  onClick={() => {
+                    handleBackUpModalVisible(true);
+                    handleBackUpRecord(record);
+                  }}
+                >
+                  回滚
+                </a>
+              );
             },
           }
         ]}
@@ -114,8 +125,9 @@ const TableList = () => {
     },
   ];
   return (
-    <PageContainer title="任务执行">
+    <PageContainer>
       <ProTable
+        actionRef={actionRef}
         rowKey="id"
         search={{
           collapsed: false,
@@ -143,11 +155,15 @@ const TableList = () => {
       />
       <BackUpModal
         visible={backUpModalVisible}
+        data={backUpRecord}
         handleCancel={() => {
           handleBackUpModalVisible(false);
+          handleBackUpRecord(null);
         }}
         handleOk={() => {
           handleBackUpModalVisible(false);
+          handleBackUpRecord(null);
+          actionRef.current?.reloadAndRest();
         }}
       />
     </PageContainer>

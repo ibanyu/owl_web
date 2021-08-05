@@ -21,7 +21,7 @@ const checkLogin = () => {
 
 const loginPath = '/user/login';
 
-const handleTokenError = (data, option) => {
+const handleTokenError = (data) => {
   const { location } = history;
   const targetPath = location.pathname;
   if(typeof data === 'string' && data.includes('please login')){
@@ -115,8 +115,7 @@ export const request = {
         message: '请求异常',
       });
     }
-
-    // throw error;
+    throw error;
   },
   requestInterceptors: [
     // 鉴权注入

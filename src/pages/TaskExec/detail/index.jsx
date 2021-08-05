@@ -57,9 +57,7 @@ const TaskDetail = () => {
           }}
           title={`确定跳过执行么`}
         >
-          <a>
-            跳过执行
-          </a>
+          <a>跳过执行</a>
         </Popconfirm>
       </>;
     }
@@ -116,7 +114,7 @@ const TaskDetail = () => {
           loading={loading}
           options={false}
           toolBarRender={() => [
-            <Popconfirm
+            operationAuth.turn_down_exec_enable && <Popconfirm
               key="reject"
               onConfirm={async () => {
                 handleModalVisible(true);
@@ -127,7 +125,7 @@ const TaskDetail = () => {
                 驳回
               </Button>
             </Popconfirm>,
-            <Popconfirm
+            operationAuth.exec_enable && <Popconfirm
               key="exec"
               onConfirm={async () => {
                 const success = await handleUpdate({
@@ -144,19 +142,19 @@ const TaskDetail = () => {
               <Button key="button" type="primary">
                 执行
               </Button>
-          </Popconfirm>,
-          <Button
-            key="schedule-exec"
-            type="default"
-            onClick={() => handleScheduleModalVisible(true)}
-          >
-            调度执行
-          </Button>
-          ]}
-          dataSource={tableDataSource}
-          columns={taskColumns}
-          rowKey="id"
-        />
+            </Popconfirm>,
+            operationAuth.exec_enable && <Button
+              key="schedule-exec"
+              type="default"
+              onClick={() => handleScheduleModalVisible(true)}
+            >
+              调度执行
+            </Button>
+            ].filter(Boolean)}
+            dataSource={tableDataSource}
+            columns={taskColumns}
+            rowKey="id"
+          />
       </Card>
       <ModalForm
         title="驳回"

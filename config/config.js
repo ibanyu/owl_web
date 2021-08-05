@@ -140,7 +140,7 @@ export default defineConfig({
     },
     {
       path: '/',
-      redirect: '/cluster',
+      redirect: '/task/add',
     },
     {
       component: '404',

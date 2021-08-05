@@ -32,7 +32,6 @@ const Login = () => {
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
-    console.log('log ------> userInfo', typeof userInfo, userInfo);
     if (userInfo) {
       setInitialState({ ...initialState, currentUser: userInfo });
     }
