@@ -1,4 +1,5 @@
-import { message, Popconfirm } from 'antd';
+import { message, Popconfirm, Button } from 'antd';
+import { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import { PageContainer } from '@ant-design/pro-layout';
@@ -9,6 +10,7 @@ import { renderBadge } from '@/constants';
 
 import { updateTask, task } from './service';
 
+const POLLING_TIME = 3000;
 /**
  * 更新节点
  *
@@ -52,6 +54,10 @@ const expandedRowRender = (row) => {
 }
 
 const TableList = () => {
+  /** 轮询配置 */
+  const [polling, setPolling] = useState(POLLING_TIME);
+  /** 上次轮询时间 */
+  const [time, setTime] = useState(() => Date.now());
   /** 窗口的弹窗 */
   const [modalVisible, handleModalVisible] = useState(false);
   /** 分布更新窗口的弹窗 */
@@ -137,6 +143,24 @@ const TableList = () => {
           ],
         }}
         options={false}
+        toolBarRender={() => [
+          <Button
+            key="polling"
+            type="primary"
+            onClick={() => {
+              if (polling) {
+                setPolling(undefined);
+                return;
+              }
+              setPolling(POLLING_TIME);
+            }}
+          >
+            {polling ? <LoadingOutlined /> : <ReloadOutlined />}
+            {polling ? '停止轮询' : '开始轮询'}
+          </Button>,
+        ]}
+        polling={polling || undefined}
+        headerTitle={`上次更新时间：${moment(time).format('HH:mm:ss')}`}
         expandable={{expandedRowRender}}
         request={async (params) => {
           const { current, pageSize, ...rest } = params;
@@ -146,6 +170,7 @@ const TableList = () => {
             ...rest,
           };
           const result = await task(pagination);
+          setTime(Date.now());
           return {
             total: result.total,
             data: result.items,
