@@ -114,16 +114,29 @@ const TaskDetail = () => {
           loading={loading}
           options={false}
           toolBarRender={() => [
-            operationAuth.turn_down_exec_enable && <Popconfirm
-              key="reject"
+            // operationAuth.turn_down_exec_enable && <Popconfirm
+            //   key="reject"
+            //   onConfirm={async () => {
+            //     handleModalVisible(true);
+            //   }}
+            //   title={`确定驳回 ${data.name} 么？`}
+            // >
+            //   <Button key="button" type="danger">
+            //     驳回
+            //   </Button>
+            // </Popconfirm>,
+            operationAuth.creator_turn_down_enable && <Popconfirm
+              key="cancel"
               onConfirm={async () => {
-                handleModalVisible(true);
+                await handleUpdate({
+                  id,
+                  action: 'cancel',
+                });
+                refresh();
               }}
-              title={`确定驳回 ${data.name} 么？`}
+              title={`确定撤销么？`}
             >
-              <Button key="button" type="danger">
-                驳回
-              </Button>
+              <Button type="default"> 撤销</Button>
             </Popconfirm>,
             operationAuth.exec_enable && <Popconfirm
               key="exec"
