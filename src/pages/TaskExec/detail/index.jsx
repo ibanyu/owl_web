@@ -21,12 +21,12 @@ const TaskDetail = () => {
   const { data = {}, loading, refresh } = useRequest(() => {
     return queryTaskProfile(id);
   });
-  const { exec_items: tableDataSource = [], edit_auth: operationAuth = {}, status: taskStatus = '' } = data;
+  const { exec_items: tableDataSource = [], edit_auth: operationAuth = {} } = data;
 
   const operationRender = (record) => {
     let operation = '';
     if(operationAuth.exec_enable){
-      operation = taskStatus?.toLocaleLowerCase().includes('failed') && <Popconfirm
+      operation = record?.status.toLocaleLowerCase().includes('failed') && <Popconfirm
         onConfirm={async () => {
           await handleUpdate({
             id,
