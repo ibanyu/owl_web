@@ -24,5 +24,5 @@ export async function queryBackUp(data, options) {
     method: 'POST',
     data,
     ...(options || {}),
-  }).then((data) => ({ data }))
+  });
 }

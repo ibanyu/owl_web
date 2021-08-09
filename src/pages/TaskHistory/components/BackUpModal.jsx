@@ -50,15 +50,14 @@ const formatBackUpData = (backUpInfo) => {
 const BackUpModal = (props) => {
   const { visible, handleOk, handleCancel, data } = props;
 
-  const { data: backUpInfo = {}, loading, run } = useRequest(() => {
-    return queryBackUp({
-      backup_id: data.backup_id,
-      cluster_name: data.cluster_name,
-      db_name: data.db_name,
-      origin_sql: data.sql_content,
-    });
-  }, {
+  const { data: backUpInfo = {}, loading, run } = useRequest(() => queryBackUp({
+    backup_id: data.backup_id,
+    cluster_name: data.cluster_name,
+    db_name: data.db_name,
+    origin_sql: data.sql_content,
+  }),{
     manual: true,
+    formatResult: (resp) => resp,
   });
 
   useEffect(() => {

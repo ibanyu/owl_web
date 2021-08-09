@@ -9,5 +9,5 @@ export async function queryTaskProfile(id, options){
     method: 'POST',
     params: { id },
     ...(options || {}),
-  }).then((data) => ({data}))
+  })
 }

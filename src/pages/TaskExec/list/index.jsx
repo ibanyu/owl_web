@@ -55,9 +55,9 @@ const expandedRowRender = (row) => {
 
 const TableList = () => {
   /** 轮询配置 */
-  const [polling, setPolling] = useState(POLLING_TIME);
+  // const [polling, setPolling] = useState(POLLING_TIME);
   /** 上次轮询时间 */
-  const [time, setTime] = useState(() => Date.now());
+  // const [time, setTime] = useState(() => Date.now());
   /** 窗口的弹窗 */
   const [modalVisible, handleModalVisible] = useState(false);
   /** 分布更新窗口的弹窗 */
@@ -143,24 +143,24 @@ const TableList = () => {
           ],
         }}
         options={false}
-        toolBarRender={() => [
-          <Button
-            key="polling"
-            type="primary"
-            onClick={() => {
-              if (polling) {
-                setPolling(undefined);
-                return;
-              }
-              setPolling(POLLING_TIME);
-            }}
-          >
-            {polling ? <LoadingOutlined /> : <ReloadOutlined />}
-            {polling ? '停止轮询' : '开始轮询'}
-          </Button>,
-        ]}
-        polling={polling || undefined}
-        headerTitle={`上次更新时间：${moment(time).format('HH:mm:ss')}`}
+        // toolBarRender={() => [
+        //   <Button
+        //     key="polling"
+        //     type="primary"
+        //     onClick={() => {
+        //       if (polling) {
+        //         setPolling(undefined);
+        //         return;
+        //       }
+        //       setPolling(POLLING_TIME);
+        //     }}
+        //   >
+        //     {polling ? <LoadingOutlined /> : <ReloadOutlined />}
+        //     {polling ? '停止轮询' : '开始轮询'}
+        //   </Button>,
+        // ]}
+        // polling={polling || undefined}
+        // headerTitle={`上次更新时间：${moment(time).format('HH:mm:ss')}`}
         expandable={{expandedRowRender}}
         request={async (params) => {
           const { current, pageSize, ...rest } = params;
@@ -170,7 +170,7 @@ const TableList = () => {
             ...rest,
           };
           const result = await task(pagination);
-          setTime(Date.now());
+          // setTime(Date.now());
           return {
             total: result.total,
             data: result.items,

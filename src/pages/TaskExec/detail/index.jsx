@@ -1,6 +1,6 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormTextArea, ProFormDateTimePicker } from '@ant-design/pro-form';
+import { ModalForm, ProFormDateTimePicker } from '@ant-design/pro-form';
 import { Card, Descriptions, Divider, Button, Popconfirm } from 'antd';
 import React, { useState } from 'react';
 import { useParams } from "react-router-dom";
@@ -12,16 +12,26 @@ import { handleUpdate } from '../list/';
 import { queryTaskProfile } from './service';
 import styles from './style.less';
 
-
 const TaskDetail = () => {
+  /** 上次轮询时间 */
+  const [time, setTime] = useState(() => Date.now());
+
   let { id } = useParams();
   id = +id;
-  const [modalVisible, handleModalVisible] = useState(false);
   const [scheduleModalVisible, handleScheduleModalVisible] = useState(false);
-  const { data = {}, loading, refresh } = useRequest(() => {
-    return queryTaskProfile(id);
+  const { data = {}, loading, refresh, cancel } = useRequest(() => queryTaskProfile(id), {
+    formatResult: (resp) => {
+      if(resp.status !== 'executing'){
+        cancel();
+      }
+      setTime(Date.now());
+      return resp;
+    },
+    pollingInterval: 3000,
   });
   const { exec_items: tableDataSource = [], edit_auth: operationAuth = {} } = data;
+
+  const IS_POLLING = data.status === 'executing';
 
   const operationRender = (record) => {
     let operation = '';
@@ -90,22 +100,12 @@ const TaskDetail = () => {
           style={{
             marginBottom: 24,
           }}
+          headerTitle={IS_POLLING ? `上次更新时间：${moment(time).format('HH:mm:ss')}` : ''}
           pagination={false}
           search={false}
           loading={loading}
           options={false}
           toolBarRender={() => [
-            // operationAuth.turn_down_exec_enable && <Popconfirm
-            //   key="reject"
-            //   onConfirm={async () => {
-            //     handleModalVisible(true);
-            //   }}
-            //   title={`确定驳回 ${data.name} 么？`}
-            // >
-            //   <Button key="button" type="danger">
-            //     驳回
-            //   </Button>
-            // </Popconfirm>,
             operationAuth.turn_down_enable && <Popconfirm
               key="cancel"
               onConfirm={async () => {
@@ -127,7 +127,6 @@ const TaskDetail = () => {
                   action: 'progress',
                 });
                 if (success) {
-                  handleModalVisible(false);
                   refresh();
                 }
               }}
@@ -150,36 +149,6 @@ const TaskDetail = () => {
             rowKey="id"
           />
       </Card>
-      <ModalForm
-        title="驳回"
-        width="400px"
-        modalProps={{destroyOnClose: true}}
-        visible={modalVisible}
-        onVisibleChange={handleModalVisible}
-        onFinish={async (fields) => {
-          const success = await handleUpdate({
-            id,
-            action: 'reject',
-            ...fields,
-          });
-          if (success) {
-            handleModalVisible(false);
-            refresh();
-          }
-        }}
-      >
-        <ProFormTextArea
-          width="md"
-          name="reject_content"
-          label="驳回理由"
-          rules={[
-            {
-              required: true,
-              message: '请输入驳回理由',
-            },
-          ]}
-        />
-      </ModalForm>
       <ModalForm
         title="调度执行"
         width="400px"
