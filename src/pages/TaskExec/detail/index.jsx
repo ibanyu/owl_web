@@ -21,45 +21,26 @@ const TaskDetail = () => {
   const { data = {}, loading, refresh } = useRequest(() => {
     return queryTaskProfile(id);
   });
-  const { exec_items: tableDataSource = [], edit_auth: operationAuth = {} } = data;
+  const { exec_items: tableDataSource = [], edit_auth: operationAuth = {}, status: taskStatus = '' } = data;
 
   const operationRender = (record) => {
     let operation = '';
     if(operationAuth.exec_enable){
-      operation = <>
-        <Popconfirm
-          onConfirm={async () => {
-            await handleUpdate({
-              id,
-              action: 'beginAt',
-              exec_item: {
-                  id: record.id,
-              },
-            });
-            refresh();
-          }}
-          title={`确定执行么？`}
-        >
-          <a>
-            执行
-          </a>
-        </Popconfirm>&nbsp;&nbsp;&nbsp;
-        <Popconfirm
-          onConfirm={async () => {
-            await handleUpdate({
-              id,
-              action: 'skipAt',
-              exec_item: {
-                  id: record.id,
-              },
-            });
-            refresh();
-          }}
-          title={`确定跳过执行么`}
-        >
-          <a>跳过执行</a>
-        </Popconfirm>
-      </>;
+      operation = taskStatus?.toLocaleLowerCase().includes('failed') && <Popconfirm
+        onConfirm={async () => {
+          await handleUpdate({
+            id,
+            action: 'skipAt',
+            exec_item: {
+                id: record.id,
+            },
+          });
+          refresh();
+        }}
+        title={`确定跳过执行么`}
+      >
+        <a>跳过执行</a>
+      </Popconfirm>;
     }
     return operation;
   };
@@ -125,7 +106,7 @@ const TaskDetail = () => {
             //     驳回
             //   </Button>
             // </Popconfirm>,
-            operationAuth.creator_turn_down_enable && <Popconfirm
+            operationAuth.turn_down_enable && <Popconfirm
               key="cancel"
               onConfirm={async () => {
                 await handleUpdate({
@@ -136,7 +117,7 @@ const TaskDetail = () => {
               }}
               title={`确定撤销么？`}
             >
-              <Button type="default"> 撤销</Button>
+              <Button type="primary"> 撤销</Button>
             </Popconfirm>,
             operationAuth.exec_enable && <Popconfirm
               key="exec"
