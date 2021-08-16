@@ -136,7 +136,7 @@ const TableList = () => {
               驳回
             </a>
           </Popconfirm>,
-          !!record.edit_auth.review_pass_enable && <a onClick={() => history.push(`/task/review/detail/${record.id}`)}>
+          <a key="review" onClick={() => history.push(`/task/review/detail/${record.id}`)}>
             审核
           </a>,
           !!record.edit_auth.withdraw_enable && <Popconfirm

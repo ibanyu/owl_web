@@ -98,7 +98,7 @@ const TableList = () => {
     },
     {
       title: '待执行时间',
-      dataIndex: 'ct',
+      dataIndex: 'et',
       render: (v) => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-',
       hideInSearch: true,
       align: 'center',

@@ -105,22 +105,22 @@ const TableList = () => {
       align: 'center',
     },
     {
-      title: '完成时间',
-      dataIndex: 'ft',
+      title: '执行时间',
+      dataIndex: 'et',
       render: (v) => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-',
       hideInSearch: true,
       align: 'center',
     },
     {
       title: '状态',
-      dataIndex: 'status_name',
+      dataIndex: 'status',
       hideInSearch: true,
       align: 'center',
       render: (text, record) => {
         if(record.reject_content){
-          return <Badge status="error" text={`${text} (理由: ${record.reject_content})`}></Badge>
+          return <Badge status="error" text={`${record.status_name} (理由: ${record.reject_content})`}></Badge>
         }
-        return renderBadge(text);
+        return renderBadge(text, record.status_name);
       }
     },
   ];
