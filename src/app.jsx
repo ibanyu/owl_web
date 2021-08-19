@@ -52,8 +52,7 @@ export async function getInitialState() {
     return undefined;
   }; // 如果是登录页面，不执行
 
-console.log('log ------> history.location.pathname', history.location.pathname);
-  if (history.location.pathname !== loginPath) {
+  if (history.location.pathname.includes(loginPath)) {
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,

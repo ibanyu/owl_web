@@ -137,7 +137,7 @@ const TableList = () => {
             </a>
           </Popconfirm>,
           <a key="review" onClick={() => history.push(`/task/review/detail/${record.id}`)}>
-            审核
+            {record.status?.toLowerCase().includes('fail') ?  '详情' : '审核'}
           </a>,
           !!record.edit_auth.withdraw_enable && <Popconfirm
             key="cancel"
