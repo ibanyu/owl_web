@@ -1,10 +1,10 @@
-# Ant Design Pro
+# 数据库审核平台
 
-This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
+项目是基于 [Ant Design Pro](https://pro.ant.design).
 
-## Environment Prepare
+## 环境准备
 
-Install `node_modules`:
+安装依赖 `node_modules`，推荐使用 yarn (依赖源：淘宝)
 
 ```bash
 npm install
@@ -13,34 +13,28 @@ npm install
 or
 
 ```bash
-yarn
+yarn install
 ```
 
-## Provided Scripts
-
-Ant Design Pro provides some useful script to help you quick start and build with web project, code style check and test.
-
-Scripts provided in `package.json`. It's safe to modify or add additional script:
-
-### Start project
+### 项目开发
 
 ```bash
-npm start
+yarn start
 ```
 
-### Build project
+### 项目构建
 
 ```bash
-npm run build
+yarn build
 ```
 
-### Check code style
+### 代码风格检查
 
 ```bash
 npm run lint
 ```
 
-You can also use script to auto fix some lint error:
+自动修复 code style
 
 ```bash
 npm run lint:fix
