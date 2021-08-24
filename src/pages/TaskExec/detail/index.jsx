@@ -3,7 +3,8 @@ import ProTable from '@ant-design/pro-table';
 import { ModalForm, ProFormDateTimePicker } from '@ant-design/pro-form';
 import { Card, Descriptions, Divider, Button, Popconfirm } from 'antd';
 import React, { useState } from 'react';
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from 'react-router-dom';
+
 import { useRequest } from 'umi';
 import moment from 'moment';
 import { renderBadge } from '@/constants';
@@ -13,15 +14,21 @@ import { queryTaskProfile } from './service';
 import styles from './style.less';
 
 const TaskDetail = () => {
+  const history = useHistory();
   /** 上次轮询时间 */
   const [time, setTime] = useState(() => Date.now());
 
   let { id } = useParams();
   id = +id;
   const [scheduleModalVisible, handleScheduleModalVisible] = useState(false);
-  const { data = {}, loading, refresh, cancel } = useRequest(() => queryTaskProfile(id), {
+  const {
+    data = {},
+    loading,
+    refresh,
+    cancel,
+  } = useRequest(() => queryTaskProfile(id), {
     formatResult: (resp) => {
-      if(resp.status !== 'executing'){
+      if (resp.status !== 'executing') {
         cancel();
       }
       setTime(Date.now());
@@ -35,34 +42,41 @@ const TaskDetail = () => {
 
   const operationRender = (record) => {
     let operation = '';
-    if(operationAuth.exec_enable){
-      operation = record?.status.toLocaleLowerCase().includes('failed') && <Popconfirm
-        onConfirm={async () => {
-          await handleUpdate({
-            id,
-            action: 'skipAt',
-            exec_item: {
+    if (operationAuth.exec_enable) {
+      operation = record?.status.toLocaleLowerCase().includes('failed') && (
+        <Popconfirm
+          onConfirm={async () => {
+            await handleUpdate({
+              id,
+              action: 'skipAt',
+              exec_item: {
                 id: record.id,
-            },
-          });
-          refresh();
-        }}
-        title={`确定跳过执行么`}
-      >
-        <a>跳过执行</a>
-      </Popconfirm>;
+              },
+            });
+            refresh();
+          }}
+          title={`确定跳过执行么`}
+        >
+          <a>跳过执行</a>
+        </Popconfirm>
+      );
     }
     return operation;
   };
   const taskColumns = [
-    { title: '序号', dataIndex: 'id', align: 'center', },
-    { title: '数据库', dataIndex: 'db_name', align: 'center', },
-    { title: '任务类型', dataIndex: 'task_type', align: 'center', },
-    { title: '影响行数', dataIndex: 'affect_rows', align: 'center', },
-    { title: '状态', dataIndex: 'status', align: 'center', render: (status) => renderBadge(status), },
-    { title: '执行信息', dataIndex: 'exec_info', align: 'center', },
-    { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code', },
-    { title: '备注', dataIndex: 'remark', align: 'center', },
+    { title: '序号', dataIndex: 'id', align: 'center' },
+    { title: '数据库', dataIndex: 'db_name', align: 'center' },
+    { title: '任务类型', dataIndex: 'task_type', align: 'center' },
+    { title: '影响行数', dataIndex: 'affect_rows', align: 'center' },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      align: 'center',
+      render: (status) => renderBadge(status),
+    },
+    { title: '执行信息', dataIndex: 'exec_info', align: 'center' },
+    { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code' },
+    { title: '备注', dataIndex: 'remark', align: 'center' },
     {
       title: '操作',
       dataIndex: 'option',
@@ -85,10 +99,16 @@ const TaskDetail = () => {
         >
           <Descriptions.Item label="任务名">{data.name}</Descriptions.Item>
           <Descriptions.Item label="任务id">{data.id}</Descriptions.Item>
-          <Descriptions.Item label="状态">{renderBadge(data.status, data.status_name)}</Descriptions.Item>
+          <Descriptions.Item label="状态">
+            {renderBadge(data.status, data.status_name)}
+          </Descriptions.Item>
           <Descriptions.Item label="创建者">{data.creator}</Descriptions.Item>
-          <Descriptions.Item label="创建时间">{data.ct ? moment.unix(data.ct).format('YYYY-MM-DD HH:mm:ss') : '-'}</Descriptions.Item>
-          <Descriptions.Item label="执行时间">{data.et ? moment.unix(data.et).format('YYYY-MM-DD HH:mm:ss') : '-'}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">
+            {data.ct ? moment.unix(data.ct).format('YYYY-MM-DD HH:mm:ss') : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="执行时间">
+            {data.et ? moment.unix(data.et).format('YYYY-MM-DD HH:mm:ss') : '-'}
+          </Descriptions.Item>
         </Descriptions>
         <Divider
           style={{
@@ -105,56 +125,64 @@ const TaskDetail = () => {
           search={false}
           loading={loading}
           options={false}
-          toolBarRender={() => [
-            operationAuth.turn_down_enable && <Popconfirm
-              key="cancel"
-              onConfirm={async () => {
-                await handleUpdate({
-                  id,
-                  action: 'cancel',
-                });
-                refresh();
-              }}
-              title={`确定撤销么？`}
-            >
-              <Button type="primary"> 撤销</Button>
-            </Popconfirm>,
-            operationAuth.exec_enable && <Popconfirm
-              key="exec"
-              onConfirm={async () => {
-                const success = await handleUpdate({
-                  id,
-                  action: 'progress',
-                });
-                if (success) {
-                  refresh();
-                }
-              }}
-              title={`确定执行 ${data.name} 么？`}
-            >
-              <Button key="button" type="primary">
-                执行
-              </Button>
-            </Popconfirm>,
-            operationAuth.exec_enable && <Button
-              key="schedule-exec"
-              type="default"
-              onClick={() => handleScheduleModalVisible(true)}
-            >
-              调度执行
-            </Button>
-            ].filter(Boolean)}
-            dataSource={tableDataSource}
-            columns={taskColumns}
-            rowKey="id"
-          />
+          toolBarRender={() =>
+            [
+              operationAuth.turn_down_enable && (
+                <Popconfirm
+                  key="cancel"
+                  onConfirm={async () => {
+                    await handleUpdate({
+                      id,
+                      action: 'cancel',
+                    });
+                    refresh();
+                  }}
+                  title={`确定撤销么？`}
+                >
+                  <Button type="primary"> 撤销</Button>
+                </Popconfirm>
+              ),
+              operationAuth.exec_enable && (
+                <Popconfirm
+                  key="exec"
+                  onConfirm={async () => {
+                    const success = await handleUpdate({
+                      id,
+                      action: 'progress',
+                    });
+                    if (success) {
+                      refresh();
+                    }
+                  }}
+                  title={`确定执行 ${data.name} 么？`}
+                >
+                  <Button key="button" type="primary">
+                    执行
+                  </Button>
+                </Popconfirm>
+              ),
+              operationAuth.exec_enable && (
+                <Button
+                  key="schedule-exec"
+                  type="default"
+                  onClick={() => handleScheduleModalVisible(true)}
+                >
+                  调度执行
+                </Button>
+              ),
+            ].filter(Boolean)
+          }
+          dataSource={tableDataSource}
+          columns={taskColumns}
+          rowKey="id"
+        />
       </Card>
       <ModalForm
         title="调度执行"
         width="400px"
         modalProps={{
           destroyOnClose: true,
-          maskClosable: false
+          maskClosable: false,
         }}
         visible={scheduleModalVisible}
         onVisibleChange={handleScheduleModalVisible}
@@ -167,7 +195,7 @@ const TaskDetail = () => {
           });
           if (success) {
             handleScheduleModalVisible(false);
-            refresh();
+            history.push('/task/list');
           }
         }}
       >
@@ -177,7 +205,7 @@ const TaskDetail = () => {
           fieldProps={{
             disabledDate: (current) => {
               return current && current < moment();
-            }
+            },
           }}
           label="开始时间"
           rules={[

@@ -1,7 +1,6 @@
-import { message, Popconfirm, Button } from 'antd';
-import { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
+import { message, Popconfirm } from 'antd';
 import React, { useState, useRef } from 'react';
-import { useHistory } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { ModalForm, ProFormTextArea } from '@ant-design/pro-form';
@@ -9,13 +8,6 @@ import moment from 'moment';
 import { renderBadge } from '@/constants';
 
 import { updateTask, task } from './service';
-
-const POLLING_TIME = 3000;
-/**
- * 更新节点
- *
- * @param fields
- */
 
 export const handleUpdate = async (fields) => {
   const hide = message.loading('正在更新');
@@ -33,25 +25,32 @@ export const handleUpdate = async (fields) => {
 
 const expandedRowRender = (row) => {
   const data = row.exec_items || [];
-  return <ProTable
-    columns={[
-      { title: '序号', dataIndex: 'id', align: 'center' },
-      { title: '数据库', dataIndex: 'db_name', align: 'center' },
-      { title: '任务类型', dataIndex: 'task_type', align: 'center' },
-      { title: '影响行数', dataIndex: 'affect_rows', align: 'center' },
-      { title: '状态1', dataIndex: 'status', render: (status) => renderBadge(status), align: 'center' },
-      { title: '执行信息', dataIndex: 'exec_info', align: 'center' },
-      { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code', },
-      { title: '备注', dataIndex: 'remark', align: 'center' },
-    ]}
-    rowKey="id"
-    headerTitle={false}
-    search={false}
-    options={false}
-    dataSource={data}
-    pagination={false}
-  />
-}
+  return (
+    <ProTable
+      columns={[
+        { title: '序号', dataIndex: 'id', align: 'center' },
+        { title: '数据库', dataIndex: 'db_name', align: 'center' },
+        { title: '任务类型', dataIndex: 'task_type', align: 'center' },
+        { title: '影响行数', dataIndex: 'affect_rows', align: 'center' },
+        {
+          title: '状态1',
+          dataIndex: 'status',
+          render: (status) => renderBadge(status),
+          align: 'center',
+        },
+        { title: '执行信息', dataIndex: 'exec_info', align: 'center' },
+        { title: 'SQL语句', dataIndex: 'sql_content', valueType: 'code' },
+        { title: '备注', dataIndex: 'remark', align: 'center' },
+      ]}
+      rowKey="id"
+      headerTitle={false}
+      search={false}
+      options={false}
+      dataSource={data}
+      pagination={false}
+    />
+  );
+};
 
 const TableList = () => {
   /** 轮询配置 */
@@ -99,7 +98,7 @@ const TableList = () => {
     {
       title: '待执行时间',
       dataIndex: 'et',
-      render: (v) => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-',
+      render: (v) => (v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-'),
       hideInSearch: true,
       align: 'center',
     },
@@ -117,15 +116,14 @@ const TableList = () => {
           }}
           title={`确定驳回 ${record.name} 么？`}
         >
-          <a>
-            驳回
-          </a>
+          <a>驳回</a>
         </Popconfirm>,
         <a
           key="submit"
           onClick={() => {
-            history.push(`/task/detail/${record.id}`)
-          }}>
+            history.push(`/task/detail/${record.id}`);
+          }}
+        >
           提交执行
         </a>,
       ],
@@ -138,9 +136,7 @@ const TableList = () => {
         rowKey="id"
         search={{
           collapsed: false,
-          optionRender: (searchConfig, formProps, dom) => [
-            ...dom.reverse(),
-          ],
+          optionRender: (searchConfig, formProps, dom) => [...dom.reverse()],
         }}
         options={false}
         // toolBarRender={() => [
@@ -161,7 +157,7 @@ const TableList = () => {
         // ]}
         // polling={polling || undefined}
         // headerTitle={`上次更新时间：${moment(time).format('HH:mm:ss')}`}
-        expandable={{expandedRowRender}}
+        expandable={{ expandedRowRender }}
         request={async (params) => {
           const { current, pageSize, ...rest } = params;
           const pagination = {
@@ -175,14 +171,14 @@ const TableList = () => {
             total: result.total,
             data: result.items,
             success: true,
-          }
+          };
         }}
         columns={columns}
       />
       <ModalForm
         title="驳回"
         width="400px"
-        modalProps={{destroyOnClose: true}}
+        modalProps={{ destroyOnClose: true }}
         visible={modalVisible}
         onVisibleChange={handleModalVisible}
         onFinish={async (fields) => {
