@@ -147,7 +147,7 @@ const TableList = () => {
                 action: 'cancel',
               })
               if(success){
-                history.push(`/task/review/detail/${record.id}`)
+                history.push(`/task/history`)
               }
             }}
             title={`确定要撤销 ${record.name} 么？`}
